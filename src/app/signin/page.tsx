@@ -118,7 +118,7 @@ function Page(): JSX.Element {
           </div>
           <div className="text-center">
             <Link
-              href='/signup'
+              href="/signup"
               className="text-sm text-blue-500 cursor-pointer hover:text-blue-700 hover:underline"
             >
               Create new account

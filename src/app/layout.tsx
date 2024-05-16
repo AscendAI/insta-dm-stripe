@@ -41,7 +41,9 @@ export default function RootLayout({
             attribute="class"
             defaultTheme="dark"
             disableTransitionOnChange
-          ></ThemeProvider>
+          >
+            {children}
+          </ThemeProvider>
           <Toaster richColors />
         </AuthWrapper>
         <TrackdeskScript />
