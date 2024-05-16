@@ -73,7 +73,7 @@ export async function updateCustomerSubscription(subscription: any) {
     } catch (error) {
       console.error('Error updating user:', error)
     }
-  }else{
+  } else {
     try {
       const querySnapshot = await q.get()
       querySnapshot.forEach(async (docSnapshot) => {
@@ -82,9 +82,9 @@ export async function updateCustomerSubscription(subscription: any) {
           stripeSubscriptionId: subscription.id,
           stripeCustomerId: subscription.customer,
           stripePriceId: subscription.items.data[0].price.id,
-         
+
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-         
+
           subscriptionSatus: subscription.status
         })
       })
