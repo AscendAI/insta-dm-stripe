@@ -10,7 +10,7 @@ import TrackdeskScript from '../components/trackDeskScript' // Adjust the path a
 import Script from 'next/script'
 export const metadata: Metadata = {
   title: 'InstaDm',
-  description: 'One stop sollution for your Insta needs!.',
+  description: 'One stop sollution for your Insta needs!',
 }
 
 export default function RootLayout({
