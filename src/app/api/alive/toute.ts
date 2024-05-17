@@ -25,5 +25,6 @@ export async function GET(request: NextRequest) {
   // } else {
   //   return NextResponse.json({ msg: 'Please login first' })
   // }
+  console.log("I am alive and kicking! PS:Vercel!")
   return NextResponse.json({ msg: 'I am alive and kicking! PS:Vercel!' })
 }
