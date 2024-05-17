@@ -28,6 +28,7 @@ const manageStripeSubscriptionAction = async ({
   // const billingUrl = "https://www.instadm.ai/download"
 
   if (isSubscribed && stripeCustomerId && isCurrentPlan) {
+    console.log('entered manageStripeSubscriptionAction')
     const stripeSession = await stripe.billingPortal.sessions.create({
       customer: stripeCustomerId,
       return_url: billingUrl,
@@ -46,7 +47,7 @@ const manageStripeSubscriptionAction = async ({
       payment_method_types: ['card'],
       mode: 'subscription',
       billing_address_collection: 'auto',
-      allow_promotion_codes:true,
+      allow_promotion_codes: true,
       line_items: [
         {
           price: stripePriceId,
@@ -65,7 +66,7 @@ const manageStripeSubscriptionAction = async ({
       mode: 'subscription',
       billing_address_collection: 'auto',
       customer_email: email,
-      allow_promotion_codes:true,
+      allow_promotion_codes: true,
       line_items: [
         {
           price: stripePriceId,
@@ -83,6 +84,7 @@ const manageStripeSubscriptionAction = async ({
 
 export async function POST(request: Request) {
   const body = await request.json()
+  console.log('Entering manageStripeSubscriptionAction')
   const res = await manageStripeSubscriptionAction(body)
   return NextResponse.json({ res })
 }
