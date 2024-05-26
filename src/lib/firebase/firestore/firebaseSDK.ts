@@ -1,5 +1,6 @@
 import { Status } from './../../instagram';
 import * as admin from 'firebase-admin'
+import { Timestamp } from 'firebase/firestore';
 import { NextRequest } from 'next/server'
 
 export interface dailyTracking {
@@ -361,6 +362,9 @@ export const updateDailyTrackingSuccess = async function (
     throw error
   }
 }
+
+
+
 export const updateDailyTrackingSuccessV2 = async function (
   userId: string,
   dailyTrackingId: string,
@@ -397,6 +401,121 @@ export const updateDailyTrackingSuccessV2 = async function (
     console.log('Daily tracking updated successfully.')
   } catch (error) {
     console.error('Error in updating daily tracking:', error)
+    throw error
+  }
+}
+
+
+// export const tableDbInsert = async function (
+//   userId: string,
+//   name: string,
+//   dateTime: string,
+// ) {
+//   try {
+//     const db = admin.firestore()
+//     console.log('userId:', userId)
+//     const userDocRef = db.collection('users').doc(userId);
+//     const successArrayCollectionRef = userDocRef.collection('successArray');
+
+//     // Check if 'successArray' subcollection exists
+//     const successArraySnapshot = await successArrayCollectionRef.get();
+//     if (successArraySnapshot.empty) {
+//       console.log('No successArray subcollection found.');
+
+//     }
+//     let date = new Date(dateTime);
+
+//     // Convert the Date object to a Firestore Timestamp
+//     console.log('date:', date)
+//     let firestoreTimestamp = Timestamp.fromDate(date);
+//     // If 'successArray' subcollection exists, add a new document
+//     const newDoc = {
+//       name: name,
+//       time: firestoreTimestamp,
+//     };
+
+//     await successArrayCollectionRef.add(newDoc);
+
+//     console.log('Daily tracking updated successfully.');
+//   } catch (error) {
+//     console.error('Error in updating daily tracking:', error)
+//     throw error
+//   }
+// }
+
+// import { Timestamp } from '@google-cloud/firestore'; // or 'firebase-admin' if you're using that
+
+export const tableDbInsert = async function (
+  userId: string,
+  name: string,
+  dateTime: string,
+) {
+  try {
+    const db = admin.firestore()
+    console.log('userId:', userId)
+    const userDocRef = db.collection('users').doc(userId);
+    const successArrayCollectionRef = userDocRef.collection('successArray');
+
+    // Check if 'successArray' subcollection exists
+    const successArraySnapshot = await successArrayCollectionRef.get();
+    if (successArraySnapshot.empty) {
+      console.log('No successArray subcollection found.');
+    }
+
+    let date = new Date(dateTime);
+
+    // Convert the Date object to a Firestore Timestamp
+    console.log('date:', date)
+    let firestoreTimestamp = admin.firestore.Timestamp.fromDate(date);
+
+    // If 'successArray' subcollection exists, add a new document
+    const newDoc = {
+      name: name,
+      time: firestoreTimestamp,
+    };
+
+    await successArrayCollectionRef.add(newDoc);
+
+    console.log('Daily tracking updated successfully.');
+  } catch (error) {
+    console.error('Error in updating daily tracking:', error)
+    throw error
+  }
+}
+
+
+
+export const tableDbFetch = async function (
+  userId: string,
+  offset: number,
+  limit: number
+) {
+  try {
+    const db = admin.firestore()
+    console.log('userId:', userId)
+    const userDocRef = db.collection('users').doc(userId);
+    const successArrayCollectionRef = userDocRef.collection('successArray');
+
+    // Check if 'successArray' subcollection exists
+    const successArraySnapshot = await successArrayCollectionRef.get();
+    if (successArraySnapshot.empty) {
+      console.log('No successArray subcollection found.');
+      return;
+    }
+
+    // Fetch documents with pagination
+    const querySnapshot = await successArrayCollectionRef
+      .orderBy('time') // assuming 'time' is the field you want to sort by
+      .startAfter(offset)
+      .limit(limit)
+      .get();
+
+    const documents = querySnapshot.docs.map(doc => doc.data());
+
+    console.log('Fetched documents:', documents);
+    return documents;
+  } catch (error) {
+    console.error('Error in fetching documents:', error)
     throw error
   }
 }
