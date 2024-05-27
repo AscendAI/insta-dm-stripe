@@ -1,6 +1,4 @@
-import { Status } from './../../instagram';
 import * as admin from 'firebase-admin'
-import { Timestamp } from 'firebase/firestore';
 import { NextRequest } from 'next/server'
 
 export interface dailyTracking {
@@ -21,6 +19,7 @@ if (admin.apps.length === 0) {
     credential: admin.credential.cert(serviceAccount),
   })
 }
+const db = admin.firestore()
 
 export async function updateUserSubscription(session: any, subscription: any) {
   const db = admin.firestore()
@@ -66,7 +65,7 @@ export async function updateCustomerSubscription(subscription: any) {
           tierName: subscription.items.data[0].plan.nickname,
           cancel_at_period_end: subscription.cancel_at_period_end,
           cancel_at: subscription.cancel_at,
-          subscriptionSatus: subscription.status
+          subscriptionSatus: subscription.status,
         })
       })
       console.log('User(s) updated(two) successfully')
@@ -86,7 +85,7 @@ export async function updateCustomerSubscription(subscription: any) {
 
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
 
-          subscriptionSatus: subscription.status
+          subscriptionSatus: subscription.status,
         })
       })
       console.log('User(s) updated(two) successfully')
@@ -95,7 +94,6 @@ export async function updateCustomerSubscription(subscription: any) {
       console.error('Error updating user:', error)
     }
   }
-
 }
 
 export async function updateUserStripeSuccess(subscription: any) {
@@ -127,7 +125,6 @@ export async function updateUserStripeSuccess(subscription: any) {
   }
 }
 
-
 export async function updateUserStripeFailure(invoice: any) {
   const db = admin.firestore()
   const usersRef = db.collection('users')
@@ -138,13 +135,8 @@ export async function updateUserStripeFailure(invoice: any) {
     querySnapshot.forEach(async (docSnapshot) => {
       const userRef = docSnapshot.ref
       await userRef.update({
-
-        stripeCurrentPeriodEnd: new Date(
-          invoice.period_end * 1000
-        ),
+        stripeCurrentPeriodEnd: new Date(invoice.period_end * 1000),
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-
-
       })
     })
     console.log('User(s) updated(two) successfully')
@@ -363,8 +355,6 @@ export const updateDailyTrackingSuccess = async function (
   }
 }
 
-
-
 export const updateDailyTrackingSuccessV2 = async function (
   userId: string,
   dailyTrackingId: string,
@@ -405,14 +395,12 @@ export const updateDailyTrackingSuccessV2 = async function (
   }
 }
 
-
 // export const tableDbInsert = async function (
 //   userId: string,
 //   name: string,
 //   dateTime: string,
 // ) {
 //   try {
-//     const db = admin.firestore()
 //     console.log('userId:', userId)
 //     const userDocRef = db.collection('users').doc(userId);
 //     const successArrayCollectionRef = userDocRef.collection('successArray');
@@ -448,42 +436,39 @@ export const updateDailyTrackingSuccessV2 = async function (
 export const tableDbInsert = async function (
   userId: string,
   name: string,
-  dateTime: string,
+  dateTime: string
 ) {
   try {
-    const db = admin.firestore()
     console.log('userId:', userId)
-    const userDocRef = db.collection('users').doc(userId);
-    const successArrayCollectionRef = userDocRef.collection('successArray');
+    const userDocRef = db.collection('users').doc(userId)
+    const successArrayCollectionRef = userDocRef.collection('successArray')
 
     // Check if 'successArray' subcollection exists
-    const successArraySnapshot = await successArrayCollectionRef.get();
+    const successArraySnapshot = await successArrayCollectionRef.get()
     if (successArraySnapshot.empty) {
-      console.log('No successArray subcollection found.');
+      console.log('No successArray subcollection found.')
     }
 
-    let date = new Date(dateTime);
+    let date = new Date(dateTime)
 
     // Convert the Date object to a Firestore Timestamp
     console.log('date:', date)
-    let firestoreTimestamp = admin.firestore.Timestamp.fromDate(date);
+    let firestoreTimestamp = admin.firestore.Timestamp.fromDate(date)
 
     // If 'successArray' subcollection exists, add a new document
     const newDoc = {
       name: name,
       time: firestoreTimestamp,
-    };
+    }
 
-    await successArrayCollectionRef.add(newDoc);
+    await successArrayCollectionRef.add(newDoc)
 
-    console.log('Daily tracking updated successfully.');
+    console.log('Daily tracking updated successfully.')
   } catch (error) {
     console.error('Error in updating daily tracking:', error)
     throw error
   }
 }
-
-
 
 export const tableDbFetch = async function (
   userId: string,
@@ -491,16 +476,15 @@ export const tableDbFetch = async function (
   limit: number
 ) {
   try {
-    const db = admin.firestore()
     console.log('userId:', userId)
-    const userDocRef = db.collection('users').doc(userId);
-    const successArrayCollectionRef = userDocRef.collection('successArray');
+    const userDocRef = db.collection('users').doc(userId)
+    const successArrayCollectionRef = userDocRef.collection('successArray')
 
     // Check if 'successArray' subcollection exists
-    const successArraySnapshot = await successArrayCollectionRef.get();
+    const successArraySnapshot = await successArrayCollectionRef.get()
     if (successArraySnapshot.empty) {
-      console.log('No successArray subcollection found.');
-      return;
+      console.log('No successArray subcollection found.')
+      return
     }
 
     // Fetch documents with pagination
@@ -508,15 +492,120 @@ export const tableDbFetch = async function (
       .orderBy('time') // assuming 'time' is the field you want to sort by
       .startAfter(offset)
       .limit(limit)
-      .get();
+      .get()
 
-    const documents = querySnapshot.docs.map(doc => doc.data());
+    const documents = querySnapshot.docs.map((doc) => doc.data())
 
-    console.log('Fetched documents:', documents);
-    return documents;
+    console.log('Fetched documents:', documents)
+    return documents
   } catch (error) {
     console.error('Error in fetching documents:', error)
     throw error
+  }
+}
+
+export const deleteSingleFromBanList = async function (name: string) {
+  if (!name) {
+    console.log('Name parameter is required.')
+    return
+  }
+
+  try {
+    console.log('Deleting name:', name)
+
+    const banListCollectionRef = db.collection('banList')
+    const querySnapshot = await banListCollectionRef
+      .where('name', '==', name)
+      .get()
+
+    if (querySnapshot.empty) {
+      console.log('No matching document found.')
+      return
+    }
+
+    // Delete all matching documents (assuming names are unique, this should only be one document)
+    querySnapshot.forEach(async (doc) => {
+      await banListCollectionRef.doc(doc.id).delete()
+    })
+
+    console.log('Document(s) deleted successfully.')
+  } catch (error: any) {
+    console.error('Error while deleting from banList:', error)
+    throw new Error(`Failed to delete from banList: ${error.message}`)
+  }
+}
+
+export const deleteAllFromBanList = async function () {
+  try {
+    const db = admin.firestore()
+    const banListCollectionRef = db.collection('banList')
+
+    // Get all documents in the banList collection
+    const querySnapshot = await banListCollectionRef.get()
+
+    if (querySnapshot.empty) {
+      console.log('No documents found in banList.')
+      return
+    }
+
+    // Batch delete all documents
+    const batch = db.batch()
+    querySnapshot.forEach((doc) => {
+      batch.delete(doc.ref)
+    })
+
+    await batch.commit()
+
+    console.log('All documents deleted successfully from banList.')
+  } catch (error: any) {
+    console.error('Error while deleting all from banList:', error)
+    throw new Error(`Failed to delete all from banList: ${error.message}`)
+  }
+}
+
+export const getTableSize = async function () {
+  try {
+    const db = admin.firestore()
+    const banListCollectionRef = db.collection('banList')
+
+    // Get all documents in the banList collection
+    const querySnapshot = await banListCollectionRef.get()
+
+    // The number of documents in the banList collection
+    const count = querySnapshot.size
+    console.log('TableSize: ', count)
+
+    // Assuming you have some mechanism to communicate back to the event (e.g., WebSocket, HTTP response)
+    // Here, simply returning the count
+    return count
+  } catch (error: any) {
+    console.error('Error while getting table size:', error)
+    throw new Error(`Failed to get table size: ${error.message}`)
+  }
+}
+
+export const retrieveDataFromDatabase = async function () {
+  try {
+    const db = admin.firestore()
+    const banListCollectionRef = db.collection('banList')
+
+    // Fetch documents with a limit of 4000
+    const querySnapshot = await banListCollectionRef.limit(4000).get()
+
+    // Map the documents to an array of data
+    const data = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }))
+
+    console.log('Result from database: ', data)
+
+    // Assuming you have some mechanism to communicate back to the event (e.g., WebSocket, HTTP response)
+    // Here, simply returning the data
+    return data
+  } catch (error: any) {
+    console.error('Error while retrieving data from database:', error)
+    throw new Error(`Failed to retrieve data from database: ${error.message}`)
   }
 }
 
@@ -618,7 +707,6 @@ export const updateDailyTrackingTotal3 = async function (
         console.log('newTotal: ', newTotal)
         transaction.update(dailyTrackingDocRef, { total: newTotal })
       }
-
     })
 
     console.log('Daily tracking updated successfully.')
@@ -1007,18 +1095,13 @@ export async function updateFoundOutField(
   }
 }
 
-export async function updateVersionField(
-  userId: string,
-  version: string
-) {
+export async function updateVersionField(userId: string, version: string) {
   const db = admin.firestore()
-
 
   const userRef = db.collection('users').doc(userId) // Reference to the user document
   const user = await userRef.get()
   const userData = user.data()
   const userVersion = userData?.version
-
 
   const versionRef = db.collection('version').doc('YJYrbWquxO4HVBB96V1J') // Reference to the user document
   const versionOne = await versionRef.get()
@@ -1028,8 +1111,6 @@ export async function updateVersionField(
   console.log(versionData)
   console.log(userVersion)
   console.log(version)
-
-
 
   if (userVersion != versionVersion) {
     try {
@@ -1050,5 +1131,4 @@ export async function updateVersionField(
   }
   console.log('version is same')
   return true
-
 }
