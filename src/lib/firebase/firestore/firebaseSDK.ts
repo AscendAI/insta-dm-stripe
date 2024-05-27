@@ -504,7 +504,7 @@ export const tableDbFetch = async function (
   }
 }
 
-export const deleteSingleFromBanList = async function (name: string) {
+export const tableDbDeleteSingleFromBanList = async function (id: string, name: string) {
   if (!name) {
     console.log('Name parameter is required.')
     return
@@ -513,7 +513,7 @@ export const deleteSingleFromBanList = async function (name: string) {
   try {
     console.log('Deleting name:', name)
 
-    const banListCollectionRef = db.collection('banList')
+    const banListCollectionRef = db.collection(`users/${id}/successArray`)
     const querySnapshot = await banListCollectionRef
       .where('name', '==', name)
       .get()
@@ -522,6 +522,7 @@ export const deleteSingleFromBanList = async function (name: string) {
       console.log('No matching document found.')
       return
     }
+    console.log('querySnapshot:', querySnapshot)
 
     // Delete all matching documents (assuming names are unique, this should only be one document)
     querySnapshot.forEach(async (doc) => {
@@ -535,10 +536,10 @@ export const deleteSingleFromBanList = async function (name: string) {
   }
 }
 
-export const deleteAllFromBanList = async function () {
+export const tableDbDeleteAllFromBanList = async function (id: string) {
   try {
     const db = admin.firestore()
-    const banListCollectionRef = db.collection('banList')
+    const banListCollectionRef = db.collection(`users/${id}/successArray`)
 
     // Get all documents in the banList collection
     const querySnapshot = await banListCollectionRef.get()
@@ -563,10 +564,10 @@ export const deleteAllFromBanList = async function () {
   }
 }
 
-export const getTableSize = async function () {
+export const tableDbGetTableSize = async function (id: string) {
   try {
     const db = admin.firestore()
-    const banListCollectionRef = db.collection('banList')
+    const banListCollectionRef = db.collection(`users/${id}/successArray`)
 
     // Get all documents in the banList collection
     const querySnapshot = await banListCollectionRef.get()
@@ -584,30 +585,40 @@ export const getTableSize = async function () {
   }
 }
 
-export const retrieveDataFromDatabase = async function () {
+
+
+export const tableDbRetrieveDataFromDatabase = async function (
+  userId: string,
+) {
   try {
-    const db = admin.firestore()
-    const banListCollectionRef = db.collection('banList')
+    console.log('userId:', userId)
+    const userDocRef = db.collection('users').doc(userId)
+    const successArrayCollectionRef = userDocRef.collection('successArray')
 
-    // Fetch documents with a limit of 4000
-    const querySnapshot = await banListCollectionRef.limit(4000).get()
+    // Check if 'successArray' subcollection exists
+    const successArraySnapshot = await successArrayCollectionRef.get()
+    if (successArraySnapshot.empty) {
+      console.log('No successArray subcollection found.')
+      return
+    }
 
-    // Map the documents to an array of data
-    const data = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }))
+    // Fetch documents with pagination
+    const querySnapshot = await successArrayCollectionRef
+      .orderBy('time') // assuming 'time' is the field you want to sort by=
+      .limit(4000)
+      .get()
 
-    console.log('Result from database: ', data)
+    const documents = querySnapshot.docs.map((doc) => doc.data())
 
-    // Assuming you have some mechanism to communicate back to the event (e.g., WebSocket, HTTP response)
-    // Here, simply returning the data
-    return data
-  } catch (error: any) {
-    console.error('Error while retrieving data from database:', error)
-    throw new Error(`Failed to retrieve data from database: ${error.message}`)
+    console.log('Fetched documents:', documents)
+    return documents
+  } catch (error) {
+    console.error('Error in fetching documents:', error)
+    throw error
   }
 }
+
+
 
 export const initializeDailyTracking = async function (
   userId: string,
