@@ -552,6 +552,40 @@ export const tableDbFetch = async function (
   }
 }
 
+export const tableDbFilterNamesInDb = async function (
+  userId: string,
+  names: { name: string }[]
+) {
+  try {
+    console.log('names:', names)
+    console.log('userId:', userId)
+    const db = admin.firestore()
+    const userDocRef = db.collection('users').doc(userId)
+    const successArrayCollectionRef = userDocRef.collection('successArray')
+
+    // Fetch all documents from 'successArray' subcollection
+    const successArraySnapshot = await successArrayCollectionRef.get()
+
+    // If 'successArray' subcollection is empty, return an empty array
+    if (successArraySnapshot.empty) {
+      console.log('No successArray subcollection found.')
+      return []
+    }
+
+    // Get all names from the fetched documents
+    const dbNames = successArraySnapshot.docs.map(doc => doc.data().name)
+
+    // Filter the names array based on whether the name is in dbNames
+    const filteredNames = names.filter(nameObj => !dbNames.includes(nameObj.name))
+
+    console.log('Filtered names:', filteredNames)
+    return filteredNames
+  } catch (error) {
+    console.error('Error in filtering names:', error)
+    throw error
+  }
+}
+
 export const tableDbDeleteSingleFromBanList = async function (id: string, name: string) {
   if (!name) {
     console.log('Name parameter is required.')
