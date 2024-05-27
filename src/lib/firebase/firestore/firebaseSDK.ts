@@ -472,7 +472,7 @@ export const tableDbInsert = async function (
 
 export const tableDbBatchInsert = async function (
   userId: string,
-  names: string[],
+  names: { name: string }[],
   dateTime: string
 ) {
   try {
