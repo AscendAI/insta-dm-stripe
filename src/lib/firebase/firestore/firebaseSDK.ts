@@ -569,7 +569,7 @@ export const tableDbFilterNamesInDb = async function (
     // If 'successArray' subcollection is empty, return an empty array
     if (successArraySnapshot.empty) {
       console.log('No successArray subcollection found.')
-      return []
+      return names
     }
 
     // Get all names from the fetched documents
