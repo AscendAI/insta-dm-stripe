@@ -10,7 +10,7 @@ const DownloadPage = () => {
             <img src="/windows.png" alt="Windows" className="h-16" />
           </div>
           <div className="text-2xl mb-5">Windows</div>
-          <a href="https://github.com/AscendAI/slyte-zero-updater/releases/download/v1.2.13/InstaDm-Setup-1.2.13.exe">
+          <a href="https://github.com/AscendAI/slyte-zero-updater/releases/download/v2.0.0/InstaDm-Setup-2.0.0.exe">
             <button
               className="bg-teal-700 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
               type="button"
@@ -25,7 +25,7 @@ const DownloadPage = () => {
             <img src="/mac.png" alt="Mac" className="h-16" />
           </div>
           <div className="text-2xl mb-5">Mac</div>
-          <a href="https://github.com/AscendAI/slyte-zero-updater/releases/download/v1.2.13/InstaDm-1.2.13-universal.dmg">
+          <a href="https://github.com/AscendAI/slyte-zero-updater/releases/download/v2.0.0/InstaDm-2.0.0-universal.dmg">
             <button
               className="mt-4 bg-teal-700 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
               type="button"
