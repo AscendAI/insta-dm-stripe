@@ -48,7 +48,7 @@ export default function Billing() {
       <div className="w-full flex flex-col justify-center items-center mb-10">
         <FormAlert />
         <div className="grid grid-cols-1">
-          <a href="/download">
+          <a href="/download" target="blank">
             <Button className="bg-[#51e0cf] p-5 col-span-1 w-full mb-3">
               Download Now!
             </Button>
@@ -59,18 +59,23 @@ export default function Billing() {
             </Button>
           </a>
           <div className="grid grid-cols-2 gap-2">
-            <a href="https://www.loom.com/share/bd0961e5c78a4725abf68272dea629c2?sid=8d32f558-dd1a-4fa0-846f-a1ab7e745a4a">
+            <a
+              href="https://www.loom.com/share/bd0961e5c78a4725abf68272dea629c2?sid=8d32f558-dd1a-4fa0-846f-a1ab7e745a4a"
+              target="blank"
+            >
               <Button className="bg-[#51e0cf] p-5 col-span-1 w-full">
                 Tutorial
               </Button>
             </a>
-            <a href="https://pond-stingray-e73.notion.site/InstaDM-Guide-7986494b4140436ea94646531ce3b36b">
+            <a
+              href="https://pond-stingray-e73.notion.site/InstaDM-Guide-7986494b4140436ea94646531ce3b36b"
+              target="blank"
+            >
               <Button className="bg-[#51e0cf] p-5 col-span-1 w-full">
                 Documentation
               </Button>
             </a>
           </div>
-        
         </div>
       </div>
 
