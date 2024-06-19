@@ -68,7 +68,7 @@ export default function Billing() {
               </Button>
             </a>
             <a
-              href="https://pond-stingray-e73.notion.site/InstaDM-Guide-7986494b4140436ea94646531ce3b36b"
+              href="https://ascendai.notion.site/InstaDM-2-0-Documentation-ca22b42c3ef8457f9bd1c399f2d2577f"
               target="blank"
             >
               <Button className="bg-[#51e0cf] p-5 col-span-1 w-full">
