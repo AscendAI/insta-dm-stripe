@@ -48,7 +48,7 @@ export default function Billing() {
       <div className="w-full flex flex-col justify-center items-center mb-10">
         <FormAlert />
         <div className="grid grid-cols-1">
-          <a href="/download" target="blank">
+          <a href="/download">
             <Button className="bg-[#51e0cf] p-5 col-span-1 w-full mb-3">
               Download Now!
             </Button>
