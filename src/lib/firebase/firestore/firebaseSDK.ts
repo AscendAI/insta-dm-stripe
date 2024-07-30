@@ -1225,3 +1225,45 @@ export async function updateVersionField(userId: string, version: string) {
   console.log('version is same')
   return true
 }
+
+
+export const updateDailyTrackingSuccess2 = async function (
+  userId: string,
+  dailyTrackingId: string,
+  successString = '',
+  loginProfile = '',
+  time: string
+) {
+  try {
+    const db = admin.firestore()
+    const dailyTrackingDoc = db.doc(
+      `users/${userId}/dailyTracking/${dailyTrackingId}`
+    )
+
+    await db.runTransaction(async (transaction) => {
+      const docSnapshot = await transaction.get(dailyTrackingDoc)
+      if (!docSnapshot.exists) {
+        throw new Error('Document does not exist!')
+      }
+
+      const currentSuccess = docSnapshot?.data()?.success || 0
+      const newSuccess = currentSuccess + 1
+
+      const currentSuccessArray = docSnapshot?.data()?.successArray || []
+      const newSuccessArray = [
+        ...currentSuccessArray,
+        { name: successString, time: time, loginProfile: loginProfile },
+      ]
+
+      transaction.update(dailyTrackingDoc, {
+        success: newSuccess,
+        successArray: newSuccessArray,
+      })
+    })
+
+    console.log('Daily tracking updated successfully.')
+  } catch (error) {
+    console.error('Error in updating daily tracking:', error)
+    throw error
+  }
+}
