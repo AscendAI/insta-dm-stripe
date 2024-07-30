@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getUser, tableDbFilterNamesInDb, } from '@/lib/firebase/firestore/firebaseSDK'
+import { IoEllipseSharp } from 'react-icons/io5'
 
 
 export async function POST(request: NextRequest) {
@@ -12,10 +13,12 @@ export async function POST(request: NextRequest) {
     let result = await tableDbFilterNamesInDb(loggedIn.uid, nameList)
     console.log('nameList', nameList)
     console.log('result', result)
-
-    return NextResponse.json({ result: result }, { status: 200 })
+    if (result) {
+      return NextResponse.json({ result: result }, { status: 200 })
+    } else {
+      return NextResponse.json({ result: [] }, { status: 402 })
+    }
   } else {
-
     return NextResponse.json({ result: [] }, { status: 401 })
   }
 }
