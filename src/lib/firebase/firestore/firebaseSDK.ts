@@ -470,6 +470,47 @@ export const tableDbInsert = async function (
   }
 }
 
+export const tableDbInsert2 = async function (
+  userId: string,
+  name: string,
+  dateTime: string,
+  loginProfile: string
+) {
+  try {
+    console.log('userId:', userId)
+    const db = admin.firestore()
+    const userDocRef = db.collection('users').doc(userId)
+    const successArrayCollectionRef = userDocRef.collection('successArray')
+
+    // Check if 'successArray' subcollection exists
+    const successArraySnapshot = await successArrayCollectionRef.get()
+    if (successArraySnapshot.empty) {
+      console.log('No successArray subcollection found.')
+    }
+
+    let date = new Date(dateTime)
+
+    // Convert the Date object to a Firestore Timestamp
+    console.log('date:', date)
+    let firestoreTimestamp = admin.firestore.Timestamp.fromDate(date)
+
+    // If 'successArray' subcollection exists, add a new document
+    const newDoc = {
+      name: name,
+      loginProfile: loginProfile,
+      time: firestoreTimestamp,
+    }
+
+    await successArrayCollectionRef.add(newDoc)
+
+    console.log('Daily tracking updated successfully.')
+  } catch (error) {
+    console.error('Error in updating daily tracking:', error)
+    throw error
+  }
+}
+
+
 export const tableDbBatchInsert = async function (
   userId: string,
   names: { name: string }[],
