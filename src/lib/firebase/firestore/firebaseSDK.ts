@@ -543,8 +543,8 @@ export const tableDbFetch = async function (
       .get()
 
     const documents = querySnapshot.docs.map((doc) => doc.data())
-
-    console.log('Fetched documents:', documents)
+    console.log("offset", offset)
+    // console.log('Fetched documents:', documents)
     return documents
   } catch (error) {
     console.error('Error in fetching documents:', error)
@@ -652,10 +652,10 @@ export const tableDbGetTableSize = async function (id: string) {
     const banListCollectionRef = db.collection(`users/${id}/successArray`)
 
     // Get all documents in the banList collection
-    const querySnapshot = await banListCollectionRef.get()
+    const querySnapshot = await banListCollectionRef.count().get()
 
     // The number of documents in the banList collection
-    const count = querySnapshot.size
+    const count = querySnapshot.data().count
     console.log('TableSize: ', count)
 
     // Assuming you have some mechanism to communicate back to the event (e.g., WebSocket, HTTP response)
@@ -666,6 +666,7 @@ export const tableDbGetTableSize = async function (id: string) {
     throw new Error(`Failed to get table size: ${error.message}`)
   }
 }
+
 
 
 
