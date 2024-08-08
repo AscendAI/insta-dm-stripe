@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
 
   if (loggedIn) {
 
-    await tableDbInsert2(loggedIn.uid, name, dateTime, loginProfile)
+    await tableDbInsert2(loggedIn.uid, name, dateTime, loginProfile ? loginProfile : null)
 
     return NextResponse.json({ loggedIn: loggedIn.uid }, { status: 200 })
   } else {
